@@ -33,6 +33,9 @@ contract Destination is AccessControl {
     function unwrap(address _wrapped_token, address _recipient, uint256 _amount) public {
         require(wrapped_tokens[_wrapped_token] != address(0), "Wrapped token not registered");
 
+        uint256 balance = BridgeToken(_wrapped_token).balanceOf(msg.sender);
+        require(balance >= _amount, "Insufficient balance to unwrap");
+
         BridgeToken(_wrapped_token).burnFrom(msg.sender, _amount);
         address underlying_token = wrapped_tokens[_wrapped_token];
         emit Unwrap(underlying_token, _wrapped_token, msg.sender, _recipient, _amount);
